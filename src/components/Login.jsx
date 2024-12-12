@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { signInWithEmailAndPassword, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../../firebaseConfig.js";
-
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,6 +38,8 @@ const Login = () => {
   return (
     <div>
       <h2>Login</h2>
+      <div>
+    </div>
       <form onSubmit={handleLogin}>
         <input
           type="email"
