@@ -3,12 +3,14 @@ import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../firebaseConfig.js";
 import { collection, addDoc } from "firebase/firestore";
+import { useAuth } from "../contexts/AuthContext";
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { fetchUserDoc } = useAuth();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -19,6 +21,7 @@ const Signup = () => {
         password
       );
       await addUser(userCredential.user.uid);
+      await fetchUserDoc(userCredential.user); // Re-fetch user document
       alert("Signup successful!");
     } catch (err) {
       setError(err.message);

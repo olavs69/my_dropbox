@@ -9,24 +9,32 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  const fetchUserDoc = async (currentUser) => {
+    if (currentUser) {
+      const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+      console.log("ID:", currentUser.uid);
+      console.log("userDoc: ", userDoc.data());
+      if (userDoc.exists()) {
+        console.log("Exists!");
+        setIsAdmin(userDoc.data().isAdmin);
+      }
+    } else {
+      console.log("No such document!");
+      setIsAdmin(false);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      if (currentUser) {
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        if (userDoc.exists()) {
-          setIsAdmin(userDoc.data().isAdmin);
-        }
-      } else {
-        setIsAdmin(false);
-      }
+      await fetchUserDoc(currentUser);
     });
 
     return () => unsubscribe();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin }}>
+    <AuthContext.Provider value={{ user, isAdmin, fetchUserDoc }}>
       {children}
     </AuthContext.Provider>
   );
