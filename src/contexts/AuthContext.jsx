@@ -16,21 +16,18 @@ export const AuthProvider = ({ children }) => {
           collection(db, "users"),
           where("userID", "==", currentUser.uid)
         );
-        console.log("Querying for user with UID:", currentUser.uid);
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           const userDoc = querySnapshot.docs[0];
-          console.log("userDoc: ", userDoc.data());
           setIsAdmin(userDoc.data().isAdmin);
         } else {
-          console.log("No such document!");
           setIsAdmin(false);
         }
       } catch (error) {
         console.error("Error fetching user document:", error);
       }
     } else {
-      console.log("No current user!");
+      console.error("No current user!", error);
       setIsAdmin(false);
     }
   };
