@@ -1,7 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
+import { db } from "../../firebaseConfig.js";
+import { collection, addDoc, updateDoc } from "firebase/firestore";
 
 const FileUpload = () => {
-  return <div>FileUpload</div>;
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const docRef = await addDoc(collection(db, "files"), {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        sharedWith: [],
+        versionHistory: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      await updateDoc(docRef, {
+        fileID: docRef.id,
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="file"
+          placeholder="file"
+          onChange={handleFileChange}
+        />
+
+        <button type="submit">Add File</button>
+      </form>
+      {file && (
+        <div>
+          <h3>User Data</h3>
+          <p>Name: {file.name}</p>
+          <p>Format: {file.type}</p>
+          <p>Size: {file.size} bytes</p>
+        </div>
+      )}
+    </>
+  );
 };
 
 export default FileUpload;
