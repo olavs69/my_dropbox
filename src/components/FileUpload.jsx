@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { db } from "../../firebaseConfig.js";
 import { collection, addDoc, updateDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
@@ -11,9 +12,14 @@ const FileUpload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const auth = getAuth();
+    const user = auth.currentUser;
+
     try {
       const docRef = await addDoc(collection(db, "files"), {
         name: file.name,
+        ownerID: user.uid,
+        path: "",
         type: file.type,
         size: file.size,
         sharedWith: [],
@@ -24,7 +30,6 @@ const FileUpload = () => {
       await updateDoc(docRef, {
         fileID: docRef.id,
       });
-      console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
